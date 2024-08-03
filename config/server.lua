@@ -8,7 +8,8 @@
             
     Name: NCX_Weather
     Author: NeonCipherX
-    Version: 1.0
+    Version: 1.1
+    - added state management
 ]]
 
 local weather_location = "London"

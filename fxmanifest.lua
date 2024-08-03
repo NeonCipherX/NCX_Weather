@@ -1,10 +1,9 @@
 fx_version 'cerulean'
 game 'gta5'
-version '1.0'
 
 description 'NCX_Weather'
 author 'NeonCipherX'
-version '1.0'
+version '1.1'
 
 
 shared_script '@ox_lib/init.lua'

@@ -8,12 +8,15 @@
             
     Name: NCX_Weather
     Author: NeonCipherX
-    Version: 1.0
+    Version: 1.1
+    - added state management
 ]]
 
 local config = require 'config.server'
 
 local weather_initialized = false
+
+GlobalState.current_weather = "SUNNY"
 
 local function get_gta_equivalent(condition)
     for _, mapping in ipairs(config.condition_mapping) do
@@ -33,7 +36,11 @@ function get_weather(callback)
         local data = json.decode(resultData)
         local condition_text = data.current.condition.text
         local gta_equivalent = get_gta_equivalent(condition_text)
-		print(condition_text .. " -> " .. gta_equivalent)
+        print(condition_text .. " -> " .. gta_equivalent)
+        
+        -- Update GlobalState.current_weather inside the callback function
+        GlobalState.current_weather = gta_equivalent
+        
         callback(gta_equivalent)
     end)
 end
@@ -41,14 +48,17 @@ end
 RegisterNetEvent('NCX_Weather:server:update_weather')
 AddEventHandler('NCX_Weather:server:update_weather', function()
     get_weather(function(gta_equivalent)
-        TriggerClientEvent('NCX_Weather:client:update_weather', -1, gta_equivalent)
+        get_weather(function(gta_equivalent)
+            GlobalState.current_weather = gta_equivalent
+        end)
+        TriggerClientEvent('NCX_Weather:client:update_weather', -1)
     end)
 end)
 
 AddEventHandler('playerConnecting', function()
 	local src = source
 	get_weather(function(gta_equivalent)
-        TriggerClientEvent('NCX_Weather:client:update_weather', src, gta_equivalent)
+        TriggerClientEvent('NCX_Weather:client:update_weather', src)
     end)
 end)
 
